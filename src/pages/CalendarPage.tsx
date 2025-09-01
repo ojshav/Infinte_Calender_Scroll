@@ -56,14 +56,19 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
     }
   }, [initialYear, initialMonth, currentVisibleMonth]);
 
-  // Handle day cell click - now opens modal
+  // Handle day cell click - now opens modal with ALL entries
   const handleDayClick = useCallback((entries: JournalEntry[]) => {
-    if (entries.length > 0) {
-      setSelectedEntries(entries);
-      setCurrentEntryIndex(0);
+    // Get all journal entries from the dataset, not just the clicked day
+    const allEntries = Object.values(entriesByDate).flat();
+    if (allEntries.length > 0) {
+      setSelectedEntries(allEntries);
+      // Find the index of the clicked day's first entry to start there
+      const clickedDayFirstEntry = entries[0];
+      const startIndex = allEntries.findIndex(entry => entry.id === clickedDayFirstEntry.id);
+      setCurrentEntryIndex(startIndex >= 0 ? startIndex : 0);
       setIsModalOpen(true);
     }
-  }, []);
+  }, [entriesByDate]);
 
   // Handle modal close
   const handleModalClose = useCallback(() => {
