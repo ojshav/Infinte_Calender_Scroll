@@ -1,0 +1,147 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+
+import type { EntriesByDate } from '../types/calendar';
+import type { JournalEntry } from '../types/journal';
+import Header from '../components/Header';
+import CalendarGrid from '../components/CalendarGrid';
+import JournalModal from '../components/JournalModal';
+
+import { formatMonthYear } from '../utils/dateUtils';
+import { loadJournalData } from '../utils/datasetLoader';
+
+interface CalendarPageProps {
+  journalDataSource?: string | any[]; // URL or direct data array
+}
+
+const CalendarPage: React.FC<CalendarPageProps> = ({ 
+  journalDataSource = [] 
+}) => {
+  // State management
+  const [entriesByDate, setEntriesByDate] = useState<EntriesByDate>({});
+  const [currentVisibleMonth, setCurrentVisibleMonth] = useState<{ year: number; month: number } | null>(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [jumpToYearFunction, setJumpToYearFunction] = useState<((year: number, month?: number) => void) | null>(null);
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEntries, setSelectedEntries] = useState<JournalEntry[]>([]);
+  const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
+
+  // Get initial month (2025 August since that's what the journal data contains)
+  const initialYear = 2025;
+  const initialMonth = 7; // August (0-based, so 7 = August)
+
+  // Load journal data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      setIsDataLoading(true);
+      try {
+        const data = await loadJournalData(journalDataSource);
+        setEntriesByDate(data);
+      } catch (error) {
+        console.error('Failed to load journal data:', error);
+        setEntriesByDate({});
+      } finally {
+        setIsDataLoading(false);
+      }
+    };
+
+    loadData();
+  }, [journalDataSource]);
+
+  // Set initial visible month
+  useEffect(() => {
+    if (!currentVisibleMonth) {
+      setCurrentVisibleMonth({ year: initialYear, month: initialMonth });
+    }
+  }, [initialYear, initialMonth, currentVisibleMonth]);
+
+  // Handle day cell click - now opens modal
+  const handleDayClick = useCallback((entries: JournalEntry[]) => {
+    if (entries.length > 0) {
+      setSelectedEntries(entries);
+      setCurrentEntryIndex(0);
+      setIsModalOpen(true);
+    }
+  }, []);
+
+  // Handle modal close
+  const handleModalClose = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedEntries([]);
+    setCurrentEntryIndex(0);
+  }, []);
+
+  // Handle modal navigation
+  const handleModalNavigate = useCallback((newIndex: number) => {
+    setCurrentEntryIndex(newIndex);
+  }, []);
+
+  // Update current visible month from CalendarGrid
+  const handleVisibleMonthChange = useCallback((year: number, month: number) => {
+    setCurrentVisibleMonth({ year, month });
+  }, []);
+
+  // Handle jump to year from Header
+  const handleJumpToYear = useCallback((year: number, month?: number) => {
+    if (jumpToYearFunction) {
+      jumpToYearFunction(year, month);
+    }
+  }, [jumpToYearFunction]);
+
+  // Handle setting jump to year function from CalendarGrid
+  const handleSetJumpToYearFunction = useCallback((jumpFunction: (year: number, month?: number) => void) => {
+    setJumpToYearFunction(() => jumpFunction);
+  }, []);
+
+  // Format current month for header
+  const currentMonthDisplay = useMemo(() => {
+    return currentVisibleMonth 
+      ? formatMonthYear(currentVisibleMonth.year, currentVisibleMonth.month)
+      : formatMonthYear(initialYear, initialMonth);
+  }, [currentVisibleMonth, initialYear, initialMonth]);
+
+  // Show loading state while data loads
+  if (isDataLoading) {
+    return (
+      <div className="flex flex-col h-screen bg-gray-50">
+        <Header currentMonth={currentMonthDisplay} onJumpToYear={handleJumpToYear} />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+            <p className="text-gray-600">Loading journal entries...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Header with current month */}
+      <Header currentMonth={currentMonthDisplay} onJumpToYear={handleJumpToYear} />
+      
+      {/* Main calendar grid */}
+      <CalendarGrid
+        initialYear={initialYear}
+        initialMonth={initialMonth}
+        entriesByDate={entriesByDate}
+        onVisibleMonthChange={handleVisibleMonthChange}
+        onDayClick={handleDayClick}
+        onJumpToYear={handleSetJumpToYearFunction}
+      />
+      
+      {/* Journal Modal */}
+      {isModalOpen && selectedEntries.length > 0 && (
+        <JournalModal
+          entries={selectedEntries}
+          currentIndex={currentEntryIndex}
+          onClose={handleModalClose}
+          onNavigate={handleModalNavigate}
+        />
+      )}
+    </div>
+  );
+};
+
+export default CalendarPage;
