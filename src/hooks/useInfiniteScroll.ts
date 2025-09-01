@@ -45,37 +45,18 @@ export const useInfiniteScroll = ({
 
   // Initialize months on mount
   useEffect(() => {
-    // Start with just the current month to avoid showing other months first
-    const currentMonth = generateMonths(
+    // Generate months in chronological order around the current month
+    const initialMonths = generateMonths(
       initialYear,
-      initialMonth,
-      1, // Only generate current month initially
+      initialMonth - bufferMonths,
+      bufferMonths * 2 + 1,
       entriesByDate
     );
-    setMonths(currentMonth);
+    const uniqueInitialMonths = removeDuplicateMonths(initialMonths);
+    
+    // Keep months in chronological order (don't force current month to top)
+    setMonths(uniqueInitialMonths);
     setCurrentVisibleMonth({ year: initialYear, month: initialMonth });
-    
-    // Load additional months after a short delay to avoid blocking initial render
-    const loadAdditionalMonths = setTimeout(() => {
-      const initialMonths = generateMonths(
-        initialYear,
-        initialMonth - bufferMonths,
-        bufferMonths * 2 + 1,
-        entriesByDate
-      );
-      const uniqueInitialMonths = removeDuplicateMonths(initialMonths);
-      
-      // Sort months so current month appears first
-      const sortedMonths = uniqueInitialMonths.sort((a, b) => {
-        if (a.year === initialYear && a.month === initialMonth) return -1;
-        if (b.year === initialYear && b.month === initialMonth) return 1;
-        return 0;
-      });
-      
-      setMonths(sortedMonths);
-    }, 200);
-    
-    return () => clearTimeout(loadAdditionalMonths);
   }, [initialYear, initialMonth, bufferMonths, entriesByDate, removeDuplicateMonths]);
 
   // Load more months at the end
@@ -90,9 +71,9 @@ export const useInfiniteScroll = ({
         const lastMonth = prevMonths[prevMonths.length - 1];
         if (!lastMonth) return prevMonths;
         
-        // Only load 2 months at a time to reduce lag
+        // Only load 1 month at a time to maintain smooth scrolling
         const { year: nextYear, month: nextMonth } = getNextMonth(lastMonth.year, lastMonth.month);
-        const newMonths = generateMonths(nextYear, nextMonth, 2, entriesByDate);
+        const newMonths = generateMonths(nextYear, nextMonth, 1, entriesByDate);
         
         // Filter out any duplicate months
         const existingKeys = new Set(prevMonths.map(m => `${m.year}-${m.month}`));
@@ -119,9 +100,9 @@ export const useInfiniteScroll = ({
         const firstMonth = prevMonths[0];
         if (!firstMonth) return prevMonths;
         
-        // Only load 2 months at a time to reduce lag
+        // Only load 1 month at a time to maintain smooth scrolling
         const { year: prevYear, month: prevMonth } = getPreviousMonth(firstMonth.year, firstMonth.month);
-        const newMonths = generateMonths(prevYear, prevMonth, 2, entriesByDate);
+        const newMonths = generateMonths(prevYear, prevMonth, 1, entriesByDate);
         
         // Filter out any duplicate months
         const existingKeys = new Set(prevMonths.map(m => `${m.year}-${m.month}`));

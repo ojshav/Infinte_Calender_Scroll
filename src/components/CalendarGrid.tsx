@@ -25,7 +25,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
     initialYear,
     initialMonth,
     entriesByDate,
-    bufferMonths: 3 // Reduced buffer for smoother performance
+    bufferMonths: 2 // Smaller buffer for more predictable loading
   });
 
   // Notify parent of visible month changes
@@ -65,30 +65,45 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
         
         {/* Calendar months */}
         <div className="px-4 py-6 space-y-8">
-          {months.map((month, index) => {
-            // Sort months to ensure current month appears first
-            const isCurrentMonth = month.year === initialYear && month.month === initialMonth;
-            return (
-              <div
-                key={`${month.year}-${month.month}-${index}`}
-                data-month={`${month.year}-${month.month}`}
-                className={`transition-all duration-500 ease-out transform hover:scale-[1.02] hover:shadow-lg ${
-                  currentVisibleMonth && 
-                  currentVisibleMonth.year === month.year && 
-                  currentVisibleMonth.month === month.month
-                    ? 'ring-2 ring-blue-500 ring-opacity-50 shadow-xl'
-                    : ''
-                }`}
-              >
-                <MonthView
-                  year={month.year}
-                  month={month.month}
-                  entriesByDate={entriesByDate}
-                  onDayClick={onDayClick}
-                />
+          {months.map((month, index) => (
+            <div
+              key={`${month.year}-${month.month}-${index}`}
+              data-month={`${month.year}-${month.month}`}
+              className={`transition-all duration-500 ease-out transform hover:scale-[1.02] hover:shadow-lg ${
+                currentVisibleMonth && 
+                currentVisibleMonth.year === month.year && 
+                currentVisibleMonth.month === month.month
+                  ? 'ring-2 ring-blue-500 ring-opacity-50 shadow-xl'
+                  : ''
+              }`}
+            >
+              {/* Month header for better navigation */}
+              <div className="text-center mb-4">
+                <h3 className={`text-lg font-semibold ${
+                  month.year === new Date().getFullYear() && month.month === new Date().getMonth()
+                    ? 'text-blue-600 font-bold'
+                    : 'text-gray-700'
+                }`}>
+                  {new Date(month.year, month.month).toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    year: 'numeric' 
+                  })}
+                  {month.year === new Date().getFullYear() && month.month === new Date().getMonth() && (
+                    <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                      Current
+                    </span>
+                  )}
+                </h3>
               </div>
-            );
-          })}
+              
+              <MonthView
+                year={month.year}
+                month={month.month}
+                entriesByDate={entriesByDate}
+                onDayClick={onDayClick}
+              />
+            </div>
+          ))}
         </div>
         
         {/* Loading indicator at bottom */}

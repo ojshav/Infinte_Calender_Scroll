@@ -47,6 +47,9 @@ const Header: React.FC<HeaderProps> = ({ currentMonth, onJumpToYear }) => {
             <h1 className="text-xl font-bold text-gray-900">
               Journal Calendar
             </h1>
+            <div className="text-sm text-gray-500 mt-1">
+              Current Month
+            </div>
             <div className="flex items-center space-x-2 mt-1 sm:mt-0">
               <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
               <span 
@@ -146,7 +149,7 @@ const Header: React.FC<HeaderProps> = ({ currentMonth, onJumpToYear }) => {
             <span>•</span>
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span>Infinite scroll loads months automatically</span>
+              <span>Calendar opens at current month</span>
             </div>
           </div>
         </div>

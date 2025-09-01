@@ -27,9 +27,10 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
   const [selectedEntries, setSelectedEntries] = useState<JournalEntry[]>([]);
   const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
 
-  // Get initial month (2025 August since that's what the journal data contains)
-  const initialYear = 2025;
-  const initialMonth = 7; // August (0-based, so 7 = August)
+  // Get current month and year dynamically
+  const now = new Date();
+  const initialYear = now.getFullYear();
+  const initialMonth = now.getMonth(); // Current month (0-based)
 
   // Load journal data on mount
   useEffect(() => {
@@ -56,19 +57,19 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
     }
   }, [initialYear, initialMonth, currentVisibleMonth]);
 
-  // Auto-scroll to current month immediately when calendar loads
+  // Auto-scroll to current month when calendar loads
   useEffect(() => {
     if (!isDataLoading && entriesByDate && Object.keys(entriesByDate).length > 0) {
-      // Scroll to current month immediately without waiting for infinite scroll
+      // Wait for infinite scroll to load months, then scroll to current month
       const timer = setTimeout(() => {
         const currentMonthElement = document.querySelector(`[data-month="${initialYear}-${initialMonth}"]`);
         if (currentMonthElement) {
           currentMonthElement.scrollIntoView({ 
-            behavior: 'instant', // Use instant scroll to avoid showing other months
-            block: 'start' 
+            behavior: 'smooth', // Use smooth scroll for better UX
+            block: 'center' 
           });
         }
-      }, 100); // Very short delay just to ensure DOM is ready
+      }, 300); // Wait for infinite scroll to finish loading
       
       return () => clearTimeout(timer);
     }
