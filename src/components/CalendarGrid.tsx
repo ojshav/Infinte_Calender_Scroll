@@ -44,42 +44,42 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
 
   return (
     <div className="flex-1 overflow-hidden">
-              {/* Scroll container for infinite months */}
-        <div
-          ref={containerRef}
-          className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400"
-          style={{
-            scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch', // iOS smooth scrolling
-          }}
-        >
+      {/* Scroll container for infinite months */}
+      <div
+        ref={containerRef}
+        className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400"
+        style={{
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch', // iOS smooth scrolling
+        }}
+      >
         {/* Loading indicator at top */}
         {isLoading && (
-          <div className="flex justify-center py-4">
+          <div className="flex justify-center py-3 sm:py-4">
             <div className="flex items-center space-x-2 text-gray-500">
-              <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-              <span className="text-sm">Loading...</span>
+              <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+              <span className="text-xs sm:text-sm">Loading...</span>
             </div>
           </div>
         )}
         
         {/* Calendar months */}
-        <div className="px-4 py-6 space-y-8">
+        <div className="px-2 sm:px-4 py-3 sm:py-6 space-y-4 sm:space-y-8">
           {months.map((month, index) => (
             <div
               key={`${month.year}-${month.month}-${index}`}
               data-month={`${month.year}-${month.month}`}
-              className={`transition-all duration-500 ease-out transform hover:scale-[1.02] hover:shadow-lg ${
+              className={`transition-all duration-300 ease-out transform hover:scale-[1.01] hover:shadow-md rounded-lg overflow-hidden ${
                 currentVisibleMonth && 
                 currentVisibleMonth.year === month.year && 
                 currentVisibleMonth.month === month.month
-                  ? 'ring-2 ring-blue-500 ring-opacity-50 shadow-xl'
-                  : ''
+                  ? 'ring-2 ring-blue-500 ring-opacity-50 shadow-lg bg-blue-50/30'
+                  : 'bg-white shadow-sm'
               }`}
             >
               {/* Month header for better navigation */}
-              <div className="text-center mb-4">
-                <h3 className={`text-lg font-semibold ${
+              <div className="text-center py-3 sm:py-4 px-2 sm:px-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                <h3 className={`text-base sm:text-lg font-semibold ${
                   month.year === new Date().getFullYear() && month.month === new Date().getMonth()
                     ? 'text-blue-600 font-bold'
                     : 'text-gray-700'
@@ -89,35 +89,38 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
                     year: 'numeric' 
                   })}
                   {month.year === new Date().getFullYear() && month.month === new Date().getMonth() && (
-                    <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                    <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
                       Current
                     </span>
                   )}
                 </h3>
               </div>
               
-              <MonthView
-                year={month.year}
-                month={month.month}
-                entriesByDate={entriesByDate}
-                onDayClick={onDayClick}
-              />
+              {/* Month content */}
+              <div className="p-2 sm:p-4">
+                <MonthView
+                  year={month.year}
+                  month={month.month}
+                  entriesByDate={entriesByDate}
+                  onDayClick={onDayClick}
+                />
+              </div>
             </div>
           ))}
         </div>
         
         {/* Loading indicator at bottom */}
         {isLoading && (
-          <div className="flex justify-center py-4">
+          <div className="flex justify-center py-3 sm:py-4">
             <div className="flex items-center space-x-2 text-gray-500">
-              <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-              <span className="text-sm">Loading more...</span>
+              <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+              <span className="text-xs sm:text-sm">Loading more...</span>
             </div>
           </div>
         )}
         
         {/* Scroll padding for better UX */}
-        <div className="h-20"></div>
+        <div className="h-16 sm:h-20"></div>
       </div>
     </div>
   );

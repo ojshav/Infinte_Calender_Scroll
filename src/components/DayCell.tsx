@@ -10,7 +10,6 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
   
   // Calculate display state
   const isClickable = hasEntries;
-  const showEntryIndicator = hasEntries;
   
   // Get top entry for preview
   const topEntry = journalEntries[0]; // Already sorted by rating in datasetLoader
@@ -24,7 +23,7 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
   return (
     <div
       className={`
-        relative min-h-20 p-2 border-r border-b border-gray-200 last:border-r-0
+        relative min-h-16 sm:min-h-20 p-1 sm:p-2 border-r border-b border-gray-200 last:border-r-0
         ${isClickable ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}
         ${!isCurrentMonth ? 'bg-gray-25' : 'bg-white'}
       `}
@@ -42,7 +41,7 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
       <div className="flex justify-between items-start mb-1">
         <span
           className={`
-            text-sm font-medium
+            text-xs sm:text-sm font-medium
             ${!isCurrentMonth ? 'text-gray-400' : 'text-gray-900'}
             ${isTodayDate ? 'text-blue-600 font-semibold' : ''}
           `}
@@ -52,19 +51,19 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
         
         {/* Today indicator */}
         {isTodayDate && (
-          <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full"></div>
         )}
       </div>
       
-      {/* Entry indicator and preview */}
-      {showEntryIndicator && (
+      {/* Entry indicator and image */}
+      {hasEntries && (
         <div className="space-y-1">
           {/* Entry count indicator */}
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full"></div>
               {journalEntries.length > 1 && (
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-gray-600 hidden sm:block">
                   +{journalEntries.length - 1}
                 </span>
               )}
@@ -92,7 +91,7 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
             <img
               src={topEntry.imgUrl}
               alt="Journal entry"
-              className="w-full h-16 object-cover rounded-md"
+              className="w-full h-12 sm:h-16 object-cover rounded-md"
               onError={(e) => {
                 e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03NSA3NUgxMjVWMTI1SDc1Vjc1WiIgZmlsbD0iI0Q0RDRENyIvPgo8L3N2Zz4K';
               }}
@@ -100,15 +99,15 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
             
             {/* Multiple entries overlay */}
             {journalEntries.length > 1 && (
-              <div className="absolute top-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1 py-0.5 rounded">
+              <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 bg-black bg-opacity-70 text-white text-xs px-1 py-0.5 rounded">
                 +{journalEntries.length - 1}
               </div>
             )}
           </div>
           
-          {/* Categories */}
+          {/* Categories - only show on larger screens */}
           {topEntry.categories.length > 0 && (
-            <div className="flex flex-wrap gap-1">
+            <div className="hidden sm:flex flex-wrap gap-1">
               {topEntry.categories.slice(0, 2).map((category, index) => (
                 <span
                   key={index}
@@ -124,14 +123,6 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
               )}
             </div>
           )}
-          
-          {/* Description preview */}
-          <p className="text-xs text-gray-600 line-clamp-2 leading-tight">
-            {topEntry.description.length > 50 
-              ? `${topEntry.description.substring(0, 50)}...`
-              : topEntry.description
-            }
-          </p>
         </div>
       )}
       

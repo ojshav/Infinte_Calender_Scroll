@@ -131,6 +131,28 @@ const JournalModal: React.FC<JournalModalProps> = ({
       <div className="relative w-full max-w-7xl">
         {/* Mobile view - single card */}
         <div className="lg:hidden relative w-full max-w-md mx-auto">
+          {/* Mobile timeline indicator */}
+          {entries.length > 1 && (
+            <div className="flex items-center justify-center mb-4">
+              <div className="flex items-center space-x-3 text-xs text-gray-600">
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                
+                </div>
+                <div className="w-12 h-0.5 bg-gradient-to-r from-gray-400 to-blue-500"></div>
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+               
+                </div>
+                <div className="w-12 h-0.5 bg-gradient-to-r from-blue-500 to-gray-400"></div>
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                 
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div 
             key={`mobile-${currentIndex}`}
             className="bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ease-out animate-fadeIn"
@@ -218,6 +240,15 @@ const JournalModal: React.FC<JournalModalProps> = ({
 
               {/* Navigation dots and View Full Post button */}
               <div className="space-y-4">
+                {/* Progress indicator */}
+                {entries.length > 1 && (
+                  <div className="text-center mb-2">
+                    <span className="text-xs text-gray-500">
+                      Entry {currentIndex + 1} of {entries.length}
+                    </span>
+                  </div>
+                )}
+                
                 {/* Navigation dots for multiple entries */}
                 {entries.length > 1 && (
                   <div className="flex items-center justify-center space-x-2">
@@ -248,10 +279,10 @@ const JournalModal: React.FC<JournalModalProps> = ({
           </div>
         </div>
 
-        {/* Desktop carousel view */}
-        <div className="hidden lg:block relative w-full">
+       
+          
           <div className="flex items-center justify-center">
-            {/* Previous entry preview (if exists) */}
+            {/* Previous entry preview (if exists) - shows older entry */}
             {currentIndex > 0 && (
               <div 
                 className="absolute left-0 w-80 transform scale-90 opacity-50 hover:opacity-75 transition-all duration-300 cursor-pointer z-0"
@@ -261,7 +292,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
                   <div className="relative h-64 bg-gray-100">
                     <img
                       src={entries[currentIndex - 1].imgUrl}
-                      alt="Previous entry"
+                      alt="Older entry"
                       className="w-full h-full object-cover"
                       onError={handleImageError}
                     />
@@ -281,7 +312,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
               </div>
             )}
 
-            {/* Next entry preview (if exists) */}
+            {/* Next entry preview (if exists) - shows newer entry */}
             {currentIndex < entries.length - 1 && (
               <div 
                 className="absolute right-0 w-80 transform scale-90 opacity-50 hover:opacity-75 transition-all duration-300 cursor-pointer z-0"
@@ -291,7 +322,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
                   <div className="relative h-64 bg-gray-100">
                     <img
                       src={entries[currentIndex + 1].imgUrl}
-                      alt="Next entry"
+                      alt="Newer entry"
                       className="w-full h-full object-cover"
                       onError={handleImageError}
                     />
@@ -399,6 +430,15 @@ const JournalModal: React.FC<JournalModalProps> = ({
 
                 {/* Navigation dots and View Full Post button */}
                 <div className="space-y-4">
+                  {/* Progress indicator */}
+                  {entries.length > 1 && (
+                    <div className="text-center mb-2">
+                      <span className="text-xs text-gray-500">
+                        Entry {currentIndex + 1} of {entries.length}
+                      </span>
+                    </div>
+                  )}
+                  
                   {/* Navigation dots for multiple entries */}
                   {entries.length > 1 && (
                     <div className="flex items-center justify-center space-x-2">
@@ -441,7 +481,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-opacity-100 hover:scale-110'
               }`}
-              aria-label="Previous entry"
+              aria-label="Older entry"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -456,7 +496,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-opacity-100 hover:scale-110'
               }`}
-              aria-label="Next entry"
+              aria-label="Newer entry"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -465,7 +505,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
           </>
         )}
       </div>
-    </div>
+    
   );
 };
 
