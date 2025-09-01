@@ -26,6 +26,7 @@ export const useInfiniteScroll = ({
   const containerRef = useRef<HTMLDivElement>(null!);
   const [months, setMonths] = useState<Month[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isScrollLocked, setIsScrollLocked] = useState(false);
   
   const [currentVisibleMonth, setCurrentVisibleMonth] = useState<{ year: number; month: number } | null>(null);
 
@@ -44,46 +45,54 @@ export const useInfiniteScroll = ({
 
   // Initialize months on mount
   useEffect(() => {
-    const initialMonths = generateMonths(
+    // Start with just the current month to avoid showing other months first
+    const currentMonth = generateMonths(
       initialYear,
-      initialMonth - bufferMonths,
-      bufferMonths * 2 + 1,
+      initialMonth,
+      1, // Only generate current month initially
       entriesByDate
     );
-    // Remove any duplicates from initial generation
-    const uniqueInitialMonths = removeDuplicateMonths(initialMonths);
-    setMonths(uniqueInitialMonths);
+    setMonths(currentMonth);
     setCurrentVisibleMonth({ year: initialYear, month: initialMonth });
     
-    // Auto-scroll to current month after a short delay to ensure rendering
-    const timer = setTimeout(() => {
-      if (containerRef.current) {
-        const currentMonthElement = containerRef.current.querySelector(`[data-month="${initialYear}-${initialMonth}"]`);
-        if (currentMonthElement) {
-          currentMonthElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
-          });
-        }
-      }
-    }, 300);
+    // Load additional months after a short delay to avoid blocking initial render
+    const loadAdditionalMonths = setTimeout(() => {
+      const initialMonths = generateMonths(
+        initialYear,
+        initialMonth - bufferMonths,
+        bufferMonths * 2 + 1,
+        entriesByDate
+      );
+      const uniqueInitialMonths = removeDuplicateMonths(initialMonths);
+      
+      // Sort months so current month appears first
+      const sortedMonths = uniqueInitialMonths.sort((a, b) => {
+        if (a.year === initialYear && a.month === initialMonth) return -1;
+        if (b.year === initialYear && b.month === initialMonth) return 1;
+        return 0;
+      });
+      
+      setMonths(sortedMonths);
+    }, 200);
     
-    return () => clearTimeout(timer);
+    return () => clearTimeout(loadAdditionalMonths);
   }, [initialYear, initialMonth, bufferMonths, entriesByDate, removeDuplicateMonths]);
 
   // Load more months at the end
   const loadMoreMonthsEnd = useCallback(() => {
-    if (isLoading) return;
+    if (isLoading || isScrollLocked) return;
     
     setIsLoading(true);
+    setIsScrollLocked(true);
+    
     setTimeout(() => {
       setMonths(prevMonths => {
         const lastMonth = prevMonths[prevMonths.length - 1];
         if (!lastMonth) return prevMonths;
         
-        // Generate months starting from the month after the last one
+        // Only load 2 months at a time to reduce lag
         const { year: nextYear, month: nextMonth } = getNextMonth(lastMonth.year, lastMonth.month);
-        const newMonths = generateMonths(nextYear, nextMonth, bufferMonths, entriesByDate);
+        const newMonths = generateMonths(nextYear, nextMonth, 2, entriesByDate);
         
         // Filter out any duplicate months
         const existingKeys = new Set(prevMonths.map(m => `${m.year}-${m.month}`));
@@ -93,22 +102,26 @@ export const useInfiniteScroll = ({
       });
       
       setIsLoading(false);
-    }, 100);
-  }, [isLoading, bufferMonths, entriesByDate]);
+      // Unlock scroll after a short delay
+      setTimeout(() => setIsScrollLocked(false), 100);
+    }, 50);
+  }, [isLoading, isScrollLocked, bufferMonths, entriesByDate]);
 
   // Load more months at the beginning
   const loadMoreMonthsStart = useCallback(() => {
-    if (isLoading) return;
+    if (isLoading || isScrollLocked) return;
     
     setIsLoading(true);
+    setIsScrollLocked(true);
+    
     setTimeout(() => {
       setMonths(prevMonths => {
         const firstMonth = prevMonths[0];
         if (!firstMonth) return prevMonths;
         
-        // Generate months ending before the first one
+        // Only load 2 months at a time to reduce lag
         const { year: prevYear, month: prevMonth } = getPreviousMonth(firstMonth.year, firstMonth.month);
-        const newMonths = generateMonths(prevYear, prevMonth, bufferMonths, entriesByDate);
+        const newMonths = generateMonths(prevYear, prevMonth, 2, entriesByDate);
         
         // Filter out any duplicate months
         const existingKeys = new Set(prevMonths.map(m => `${m.year}-${m.month}`));
@@ -118,8 +131,10 @@ export const useInfiniteScroll = ({
       });
       
       setIsLoading(false);
-    }, 100);
-  }, [isLoading, bufferMonths, entriesByDate]);
+      // Unlock scroll after a short delay
+      setTimeout(() => setIsScrollLocked(false), 100);
+    }, 50);
+  }, [isLoading, isScrollLocked, bufferMonths, entriesByDate]);
 
   // Jump to a specific year and month
   const jumpToYear = useCallback((targetYear: number, targetMonth: number = 0) => {
@@ -197,32 +212,32 @@ export const useInfiniteScroll = ({
 
   // Handle scroll events
   const handleScroll = useCallback(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || isScrollLocked) return;
     
     const container = containerRef.current;
     const { scrollTop, scrollHeight, clientHeight } = container;
     
-    // Check if we need to load more at the bottom
-    if (scrollTop + clientHeight >= scrollHeight - 1000) {
+    // Check if we need to load more at the bottom (only when close to bottom)
+    if (scrollTop + clientHeight >= scrollHeight - 500) {
       loadMoreMonthsEnd();
     }
     
-    // Check if we need to load more at the top
-    if (scrollTop <= 1000) {
+    // Check if we need to load more at the top (only when close to top)
+    if (scrollTop <= 500) {
       const currentScrollTop = container.scrollTop;
       loadMoreMonthsStart();
       
       // Maintain scroll position after prepending months
       setTimeout(() => {
         if (containerRef.current) {
-          containerRef.current.scrollTop = currentScrollTop + 2000;
+          containerRef.current.scrollTop = currentScrollTop + 1000; // Reduced offset
         }
-      }, 150);
+      }, 100); // Reduced delay
     }
     
     // Detect visible month
     detectVisibleMonth();
-  }, [loadMoreMonthsEnd, loadMoreMonthsStart, detectVisibleMonth]);
+  }, [loadMoreMonthsEnd, loadMoreMonthsStart, detectVisibleMonth, isScrollLocked]);
 
   // Throttled scroll handler using useRef to avoid recreation
   const throttledScrollHandlerRef = useRef<(() => void) | null>(null);
@@ -230,12 +245,16 @@ export const useInfiniteScroll = ({
   // Initialize throttled scroll handler once
   useEffect(() => {
     let ticking = false;
+    let lastScrollTime = 0;
+    const throttleDelay = 16; // ~60fps
     
     throttledScrollHandlerRef.current = () => {
-      if (!ticking) {
+      const now = Date.now();
+      if (!ticking && now - lastScrollTime >= throttleDelay) {
         requestAnimationFrame(() => {
           handleScroll();
           ticking = false;
+          lastScrollTime = now;
         });
         ticking = true;
       }

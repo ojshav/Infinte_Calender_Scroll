@@ -56,6 +56,24 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
     }
   }, [initialYear, initialMonth, currentVisibleMonth]);
 
+  // Auto-scroll to current month immediately when calendar loads
+  useEffect(() => {
+    if (!isDataLoading && entriesByDate && Object.keys(entriesByDate).length > 0) {
+      // Scroll to current month immediately without waiting for infinite scroll
+      const timer = setTimeout(() => {
+        const currentMonthElement = document.querySelector(`[data-month="${initialYear}-${initialMonth}"]`);
+        if (currentMonthElement) {
+          currentMonthElement.scrollIntoView({ 
+            behavior: 'instant', // Use instant scroll to avoid showing other months
+            block: 'start' 
+          });
+        }
+      }, 100); // Very short delay just to ensure DOM is ready
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isDataLoading, entriesByDate, initialYear, initialMonth]);
+
   // Handle day cell click - now opens modal with ALL entries
   const handleDayClick = useCallback((entries: JournalEntry[]) => {
     // Get all journal entries from the dataset, not just the clicked day

@@ -141,7 +141,12 @@ const Header: React.FC<HeaderProps> = ({ currentMonth, onJumpToYear }) => {
             <span>•</span>
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span>Click "Today" to return to current month</span>
+              <span>Use "Jump to Year" for quick navigation</span>
+            </div>
+            <span>•</span>
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span>Infinite scroll loads months automatically</span>
             </div>
           </div>
         </div>
