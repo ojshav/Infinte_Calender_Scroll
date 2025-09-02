@@ -26,6 +26,8 @@ export const useInfiniteScroll = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [months, setMonths] = useState<Month[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingTop, setIsLoadingTop] = useState(false);
+  const [isLoadingBottom, setIsLoadingBottom] = useState(false);
   const [currentVisibleMonth, setCurrentVisibleMonth] = useState<{ year: number; month: number } | null>(null);
 
   // Initialize months on mount - center on current month
@@ -68,9 +70,9 @@ export const useInfiniteScroll = ({
 
   // Load more months at the end
   const loadMoreMonthsEnd = useCallback(() => {
-    if (isLoading) return;
+    if (isLoadingBottom) return;
     
-    setIsLoading(true);
+    setIsLoadingBottom(true);
     setTimeout(() => {
       setMonths(prevMonths => {
         const lastMonth = prevMonths[prevMonths.length - 1];
@@ -89,15 +91,15 @@ export const useInfiniteScroll = ({
         return [...prevMonths, newMonth];
       });
       
-      setIsLoading(false);
+      setIsLoadingBottom(false);
     }, 100);
-  }, [isLoading, entriesByDate]);
+  }, [isLoadingBottom, entriesByDate]);
 
   // Load more months at the beginning
   const loadMoreMonthsStart = useCallback(() => {
-    if (isLoading) return;
+    if (isLoadingTop) return;
     
-    setIsLoading(true);
+    setIsLoadingTop(true);
     setTimeout(() => {
       setMonths(prevMonths => {
         const firstMonth = prevMonths[0];
@@ -116,9 +118,9 @@ export const useInfiniteScroll = ({
         return [newMonth, ...prevMonths];
       });
       
-      setIsLoading(false);
+      setIsLoadingTop(false);
     }, 100);
-  }, [isLoading, entriesByDate]);
+  }, [isLoadingTop, entriesByDate]);
 
   // Jump to a specific year and month
   const jumpToYear = useCallback((targetYear: number, targetMonth: number = 0) => {
@@ -206,17 +208,31 @@ export const useInfiniteScroll = ({
       loadMoreMonthsEnd();
     }
     
-    // Load more months at the top
+    // Load more months at the top - with better scroll position management
     if (scrollTop <= 300) {
+      // Store current scroll position and viewport height
       const currentScrollTop = container.scrollTop;
+      const currentScrollHeight = container.scrollHeight;
+      
+      // Load the new month
       loadMoreMonthsStart();
       
-      // Maintain scroll position after prepending months
+      // After the new month is added, adjust scroll position smoothly
       setTimeout(() => {
         if (containerRef.current) {
-          containerRef.current.scrollTop = currentScrollTop + 800;
+          const newScrollHeight = containerRef.current.scrollHeight;
+          const heightDifference = newScrollHeight - currentScrollHeight;
+          
+          // Smoothly adjust scroll position to maintain visual continuity
+          if (heightDifference > 0) {
+            // Use smooth scrolling animation to adjust position
+            containerRef.current.scrollTo({
+              top: currentScrollTop + heightDifference,
+              behavior: 'smooth'
+            });
+          }
         }
-      }, 100);
+      }, 150); // Slightly longer delay to ensure DOM update
     }
   }, [loadMoreMonthsEnd, loadMoreMonthsStart]);
 
@@ -247,7 +263,7 @@ export const useInfiniteScroll = ({
     months,
     currentVisibleMonth,
     containerRef,
-    isLoading,
+    isLoading: isLoading || isLoadingTop || isLoadingBottom,
     jumpToYear
   };
 };

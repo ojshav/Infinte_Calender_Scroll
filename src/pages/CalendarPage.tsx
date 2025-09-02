@@ -61,11 +61,25 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
   // Handle day cell click
   const handleDayClick = useCallback((entries: JournalEntry[]) => {
     if (entries.length > 0) {
-      setSelectedEntries(entries);
-      setCurrentEntryIndex(0);
+      // Get ALL journal entries from the entire dataset and sort chronologically
+      const allEntries = Object.values(entriesByDate).flat();
+      
+      // Sort entries by date (oldest to newest)
+      const sortedEntries = allEntries.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      });
+      
+      // Find the index of the clicked day's first entry in the sorted array
+      const clickedDayFirstEntry = entries[0];
+      const startIndex = sortedEntries.findIndex(entry => entry.id === clickedDayFirstEntry.id);
+      
+      setSelectedEntries(sortedEntries);
+      setCurrentEntryIndex(startIndex >= 0 ? startIndex : 0);
       setIsModalOpen(true);
     }
-  }, []);
+  }, [entriesByDate]);
 
   // Handle modal close
   const handleModalClose = useCallback(() => {

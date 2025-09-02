@@ -28,7 +28,7 @@ const MonthView: React.FC<ExtendedMonthViewProps> = ({
   };
 
   return (
-    <div className="mb-8">
+    <div className="mb-8 animate-fade-in-up">
       {/* Month header */}
       <div className="mb-4 px-4">
         <h2 className="text-xl font-semibold text-gray-900">
@@ -37,7 +37,7 @@ const MonthView: React.FC<ExtendedMonthViewProps> = ({
       </div>
       
       {/* Calendar grid container */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
         {/* Week day headers */}
         <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
           {weekDays.map((day) => (

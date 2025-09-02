@@ -107,99 +107,55 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Navigation buttons */}
-      <div className="absolute inset-y-0 left-4 flex items-center z-10">
-        <button
-          onClick={goToPrevious}
-          disabled={currentIndex === 0}
-          className={`
-            w-10 h-10 rounded-full bg-black bg-opacity-50 text-white
-            flex items-center justify-center transition-all duration-200
-            ${currentIndex === 0 
-              ? 'opacity-30 cursor-not-allowed' 
-              : 'hover:bg-opacity-70 active:scale-95'
-            }
-          `}
-          aria-label="Previous entry"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="absolute inset-y-0 right-4 flex items-center z-10">
-        <button
-          onClick={goToNext}
-          disabled={currentIndex === total - 1}
-          className={`
-            w-10 h-10 rounded-full bg-black bg-opacity-50 text-white
-            flex items-center justify-center transition-all duration-200
-            ${currentIndex === total - 1 
-              ? 'opacity-30 cursor-not-allowed' 
-              : 'hover:bg-opacity-70 active:scale-95'
-            }
-          `}
-          aria-label="Next entry"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Progress indicator */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="flex items-center space-x-2 bg-black bg-opacity-50 px-4 py-2 rounded-full">
-          {/* Current position */}
-          <span className="text-white text-sm font-medium">
-            {currentIndex + 1} / {total}
-          </span>
-          
-          {/* Dot indicators (max 7 dots for mobile) */}
-          {total <= 7 ? (
-            <div className="flex items-center space-x-1 ml-2">
-              {[...Array(total)].map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToIndex(index)}
-                  className={`
-                    w-2 h-2 rounded-full transition-all duration-200
-                    ${index === currentIndex 
-                      ? 'bg-white scale-125' 
-                      : 'bg-white bg-opacity-50 hover:bg-opacity-70'
-                    }
-                  `}
-                  aria-label={`Go to entry ${index + 1}`}
-                />
-              ))}
-            </div>
-          ) : (
-            // Progress bar for many entries
-            <div className="w-20 h-1 bg-white bg-opacity-30 rounded-full ml-2 overflow-hidden">
-              <div
-                className="h-full bg-white rounded-full transition-all duration-300 ease-out"
-                style={{
-                  width: `${((currentIndex + 1) / total) * 100}%`
-                }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Swipe hint (only show on first load) */}
+      {/* Navigation buttons - only show if multiple entries */}
       {total > 1 && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-xs">
-            Swipe or use ← → keys to navigate
-          </div>
-        </div>
+        <>
+          {/* Previous button (Older entry) */}
+          <button
+            onClick={goToPrevious}
+            disabled={currentIndex === 0}
+            className={`absolute left-4 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 bg-white bg-opacity-90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
+              currentIndex === 0 ? 'opacity-50' : 'hover:bg-opacity-100'
+            }`}
+            aria-label="Previous entry (older)"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="sr-only">Older entry</span>
+          </button>
+
+          {/* Next button (Newer entry) */}
+          <button
+            onClick={goToNext}
+            disabled={currentIndex === total - 1}
+            className={`absolute right-4 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 bg-white bg-opacity-90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
+              currentIndex === total - 1 ? 'opacity-50' : 'hover:bg-opacity-100'
+            }`}
+            aria-label="Next entry (newer)"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <span className="sr-only">Newer entry</span>
+          </button>
+        </>
       )}
 
-      {/* Render children content */}
+      
+      
+      {/* Render children content with smooth transitions */}
       <div className="w-full h-full flex items-center justify-center">
-        {children}
+        <div 
+          key={currentIndex}
+          className="w-full h-full flex items-center justify-center animate-fade-in-up"
+          style={{
+            animationDelay: '0ms',
+            animationFillMode: 'both'
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
