@@ -1,4 +1,4 @@
-import React, {useEffect } from 'react';
+import React, { useEffect } from 'react';
 import type { JournalEntry } from '../types/journal';
 import MonthView from './MonthView';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
@@ -77,25 +77,6 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
                   : 'bg-white shadow-sm'
               }`}
             >
-              {/* Month header for better navigation */}
-              <div className="text-center py-3 sm:py-4 px-2 sm:px-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                <h3 className={`text-base sm:text-lg font-semibold ${
-                  month.year === new Date().getFullYear() && month.month === new Date().getMonth()
-                    ? 'text-blue-600 font-bold'
-                    : 'text-gray-700'
-                }`}>
-                  {new Date(month.year, month.month).toLocaleDateString('en-US', { 
-                    month: 'long', 
-                    year: 'numeric' 
-                  })}
-                  {month.year === new Date().getFullYear() && month.month === new Date().getMonth() && (
-                    <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
-                      Current
-                    </span>
-                  )}
-                </h3>
-              </div>
-              
               {/* Month content */}
               <div className="p-2 sm:p-4">
                 <MonthView

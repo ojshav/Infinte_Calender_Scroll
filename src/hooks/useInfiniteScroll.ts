@@ -191,6 +191,66 @@ export const useInfiniteScroll = ({
     }
   }, []); // Remove currentVisibleMonth dependency to avoid circular updates
 
+  // Debounced visible month detection to prevent excessive updates
+  const debouncedDetectVisibleMonth = useCallback(() => {
+    if (!containerRef.current) return;
+    
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.top + containerRect.height / 2;
+    
+    // Find all month elements
+    const monthElements = container.querySelectorAll('[data-month]');
+    let closestYear = 0;
+    let closestMonth = 0;
+    let minDistance = Infinity;
+    
+    monthElements.forEach((element) => {
+      const rect = element.getBoundingClientRect();
+      const elementCenter = rect.top + rect.height / 2;
+      const distance = Math.abs(elementCenter - containerCenter);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        const monthData = element.getAttribute('data-month');
+        if (monthData) {
+          const [year, month] = monthData.split('-').map(Number);
+          closestYear = year;
+          closestMonth = month;
+        }
+      }
+    });
+    
+    // Only update if the month has actually changed significantly
+    if (closestYear > 0 && closestMonth > 0) {
+      setCurrentVisibleMonth(prev => {
+        // If no previous month, update immediately
+        if (!prev) {
+          return { year: closestYear, month: closestMonth };
+        }
+        
+        // Only update if month has changed (not just small scroll movements)
+        if (prev.year !== closestYear || prev.month !== closestMonth) {
+          // Add a small threshold to prevent rapid changes
+          // Only update if we're significantly closer to the new month
+          const currentMonthElement = container.querySelector(`[data-month="${prev.year}-${prev.month}"]`);
+          if (currentMonthElement) {
+            const currentRect = currentMonthElement.getBoundingClientRect();
+            const currentDistance = Math.abs(currentRect.top + currentRect.height / 2 - containerCenter);
+            
+            // Only update if the new month is significantly closer (within 100px threshold)
+            if (minDistance < currentDistance - 100) {
+              return { year: closestYear, month: closestMonth };
+            }
+          }
+        }
+        
+        // Keep the previous month to prevent unnecessary updates
+        return prev;
+      });
+    }
+  }, []);
+
   // Handle scroll events
   const handleScroll = useCallback(() => {
     if (!containerRef.current || isScrollLocked) return;
@@ -216,9 +276,9 @@ export const useInfiniteScroll = ({
       }, 100); // Reduced delay
     }
     
-    // Detect visible month
-    detectVisibleMonth();
-  }, [loadMoreMonthsEnd, loadMoreMonthsStart, detectVisibleMonth, isScrollLocked]);
+    // Don't detect visible month on every scroll - this causes lag
+    // We'll use a separate, less frequent detection mechanism
+  }, [loadMoreMonthsEnd, loadMoreMonthsStart, isScrollLocked]);
 
   // Throttled scroll handler using useRef to avoid recreation
   const throttledScrollHandlerRef = useRef<(() => void) | null>(null);
@@ -242,7 +302,38 @@ export const useInfiniteScroll = ({
     };
   }, [handleScroll]);
 
-  // Set up scroll listener
+  // Separate, less frequent visible month detection
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    let ticking = false;
+    let lastDetectionTime = 0;
+    const detectionDelay = 300; // Increased to 300ms for more stability
+    
+    const handleScrollForMonthDetection = () => {
+      const now = Date.now();
+      if (!ticking && now - lastDetectionTime >= detectionDelay) {
+        requestAnimationFrame(() => {
+          debouncedDetectVisibleMonth();
+          ticking = false;
+          lastDetectionTime = now;
+        });
+        ticking = true;
+      }
+    };
+    
+    container.addEventListener('scroll', handleScrollForMonthDetection, { passive: true });
+    
+    // Initial visible month detection
+    setTimeout(() => debouncedDetectVisibleMonth(), 100);
+    
+    return () => {
+      container.removeEventListener('scroll', handleScrollForMonthDetection);
+    };
+  }, [debouncedDetectVisibleMonth]);
+
+  // Set up scroll listener for month loading
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -252,13 +343,10 @@ export const useInfiniteScroll = ({
     
     container.addEventListener('scroll', scrollHandler, { passive: true });
     
-    // Initial visible month detection
-    setTimeout(() => detectVisibleMonth(), 100);
-    
     return () => {
       container.removeEventListener('scroll', scrollHandler);
     };
-  }, [detectVisibleMonth]); // Only depend on detectVisibleMonth
+  }, []); // No dependencies to avoid recreation
 
   return {
     months,

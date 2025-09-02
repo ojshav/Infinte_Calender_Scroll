@@ -19,11 +19,6 @@ const Header: React.FC<HeaderProps> = ({ currentMonth, onJumpToYear }) => {
 
   // Get current date for "today" reference
   const today = new Date();
-  // const todayStr = today.toLocaleDateString('en-US', { 
-  //   month: 'long', 
-  //   day: 'numeric',
-  //   year: 'numeric'
-  // });
 
   // Handle year jump
   const handleYearJump = () => {
@@ -47,9 +42,6 @@ const Header: React.FC<HeaderProps> = ({ currentMonth, onJumpToYear }) => {
             <h1 className="text-xl font-bold text-gray-900">
               Journal Calendar
             </h1>
-            <div className="text-sm text-gray-500 mt-1">
-              Current Month
-            </div>
             <div className="flex items-center space-x-2 mt-1 sm:mt-0">
               <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
               <span 

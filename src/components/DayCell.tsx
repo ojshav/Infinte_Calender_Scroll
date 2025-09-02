@@ -5,14 +5,15 @@ import { isToday } from '../utils/dateUtils';
 const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
   const { date, isCurrentMonth, journalEntries } = day;
   const dayNumber = date.getDate();
-  const hasEntries = journalEntries.length > 0;
+  // Only show entries if this day is in the current month
+  const hasEntries = isCurrentMonth && journalEntries.length > 0;
   const isTodayDate = isToday(date);
   
   // Calculate display state
   const isClickable = hasEntries;
   
-  // Get top entry for preview
-  const topEntry = journalEntries[0]; // Already sorted by rating in datasetLoader
+  // Get top entry for preview (only if it's current month)
+  const topEntry = isCurrentMonth && journalEntries.length > 0 ? journalEntries[0] : null;
 
   const handleClick = () => {
     if (isClickable) {
@@ -55,8 +56,8 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
         )}
       </div>
       
-      {/* Entry indicator and image */}
-      {hasEntries && (
+      {/* Entry indicator and image - ONLY show for current month */}
+      {hasEntries && topEntry && (
         <div className="space-y-1">
           {/* Entry count indicator */}
           <div className="flex items-center justify-between mb-1">
