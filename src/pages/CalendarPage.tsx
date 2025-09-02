@@ -53,6 +53,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
   // Set initial visible month
   useEffect(() => {
     if (!currentVisibleMonth) {
+      console.log(`CalendarPage: Setting initial visible month to ${initialYear}-${initialMonth} (${formatMonthYear(initialYear, initialMonth)})`);
       setCurrentVisibleMonth({ year: initialYear, month: initialMonth });
     }
   }, [initialYear, initialMonth, currentVisibleMonth]);
@@ -80,6 +81,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
 
   // Update current visible month from CalendarGrid
   const handleVisibleMonthChange = useCallback((year: number, month: number) => {
+    console.log(`CalendarPage: Visible month changed to ${year}-${month} (${formatMonthYear(year, month)})`);
     setCurrentVisibleMonth({ year, month });
   }, []);
 

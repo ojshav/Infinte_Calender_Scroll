@@ -25,7 +25,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
     initialYear,
     initialMonth,
     entriesByDate,
-    bufferMonths: 2 // Smaller buffer for more predictable loading
+    bufferMonths: 3
   });
 
   // Notify parent of visible month changes
@@ -50,7 +50,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
         className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400"
         style={{
           scrollBehavior: 'smooth',
-          WebkitOverflowScrolling: 'touch', // iOS smooth scrolling
+          WebkitOverflowScrolling: 'touch',
         }}
       >
         {/* Loading indicator at top */}

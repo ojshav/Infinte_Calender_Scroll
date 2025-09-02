@@ -139,9 +139,17 @@ export const generateMonths = (
   
   for (let i = 0; i < count; i++) {
     // Calculate the correct year and month for each iteration
-    const totalMonths = startMonth + i;
-    const year = startYear + Math.floor(totalMonths / 12);
-    const month = totalMonths % 12;
+    let year = startYear;
+    let month = startMonth + i;
+    
+    // Handle negative months and months >= 12
+    if (month < 0) {
+      year -= Math.ceil(Math.abs(month) / 12);
+      month = 12 + (month % 12);
+    } else if (month >= 12) {
+      year += Math.floor(month / 12);
+      month = month % 12;
+    }
     
     months.push({
       year,
