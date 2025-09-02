@@ -13,8 +13,8 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Minimum swipe distance (in px)
-  const minSwipeDistance = 50;
+ 
+  const minSwipeDistance = 20;
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -22,14 +22,14 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
     
     switch (e.key) {
       case 'ArrowLeft':
-      case 'h': // Vim-style
+      case 'h': 
         e.preventDefault();
         if (currentIndex > 0) {
           handleNavigate(currentIndex - 1);
         }
         break;
       case 'ArrowRight':
-      case 'l': // Vim-style
+      case 'l': 
         e.preventDefault();
         if (currentIndex < total - 1) {
           handleNavigate(currentIndex + 1);

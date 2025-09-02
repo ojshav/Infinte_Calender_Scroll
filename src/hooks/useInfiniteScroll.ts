@@ -31,11 +31,11 @@ export const useInfiniteScroll = ({
   const [isLoadingBottom, setIsLoadingBottom] = useState(false);
   const [currentVisibleMonth, setCurrentVisibleMonth] = useState<{ year: number; month: number } | null>(null);
 
-  // Initialize months on mount - center on current month
+  
   useEffect(() => {
-    // Generate months centered around the current month
+    
     const startMonth = initialMonth - bufferMonths;
-    const totalMonths = bufferMonths * 2 + 1; // Total months to generate
+    const totalMonths = bufferMonths * 2 + 1; 
     
  
     
@@ -68,7 +68,7 @@ export const useInfiniteScroll = ({
     }, 100);
   }, [initialYear, initialMonth, bufferMonths, entriesByDate]);
 
-  // Load more months at the end
+  
   const loadMoreMonthsEnd = useCallback(() => {
     if (isLoadingBottom) return;
     
@@ -95,7 +95,7 @@ export const useInfiniteScroll = ({
     }, 100);
   }, [isLoadingBottom, entriesByDate]);
 
-  // Load more months at the beginning
+
   const loadMoreMonthsStart = useCallback(() => {
     if (isLoadingTop) return;
     
@@ -128,7 +128,7 @@ export const useInfiniteScroll = ({
     
     setIsLoading(true);
     setTimeout(() => {
-      // Generate months centered around the target year/month
+     
       const startMonth = targetMonth - bufferMonths;
       const totalMonths = bufferMonths * 2 + 1;
       
@@ -143,7 +143,7 @@ export const useInfiniteScroll = ({
       setCurrentVisibleMonth({ year: targetYear, month: targetMonth });
       setIsLoading(false);
       
-      // Scroll to the target month
+   
       setTimeout(() => {
         if (containerRef.current) {
           const targetElement = containerRef.current.querySelector(`[data-month="${targetYear}-${targetMonth}"]`);
@@ -155,7 +155,7 @@ export const useInfiniteScroll = ({
     }, 100);
   }, [isLoading, bufferMonths, entriesByDate]);
 
-  // Detect which month is currently most visible
+
   const detectVisibleMonth = useCallback(() => {
     if (!containerRef.current) return;
     
@@ -163,7 +163,7 @@ export const useInfiniteScroll = ({
     const containerRect = container.getBoundingClientRect();
     const containerCenter = containerRect.top + containerRect.height / 2;
     
-    // Find all month elements
+
     const monthElements = container.querySelectorAll('[data-month]');
     let closestYear = 0;
     let closestMonth = 0;
@@ -185,7 +185,7 @@ export const useInfiniteScroll = ({
       }
     });
     
-    // Update visible month if it changed
+    
     if (closestYear > 0 && closestMonth >= 0) {
       setCurrentVisibleMonth(prev => {
         if (!prev || prev.year !== closestYear || prev.month !== closestMonth) {
@@ -208,35 +208,34 @@ export const useInfiniteScroll = ({
       loadMoreMonthsEnd();
     }
     
-    // Load more months at the top - with better scroll position management
+
     if (scrollTop <= 300) {
-      // Store current scroll position and viewport height
+      
       const currentScrollTop = container.scrollTop;
       const currentScrollHeight = container.scrollHeight;
       
       // Load the new month
       loadMoreMonthsStart();
       
-      // After the new month is added, adjust scroll position smoothly
       setTimeout(() => {
         if (containerRef.current) {
           const newScrollHeight = containerRef.current.scrollHeight;
           const heightDifference = newScrollHeight - currentScrollHeight;
           
-          // Smoothly adjust scroll position to maintain visual continuity
+         
           if (heightDifference > 0) {
-            // Use smooth scrolling animation to adjust position
+ 
             containerRef.current.scrollTo({
               top: currentScrollTop + heightDifference,
               behavior: 'smooth'
             });
           }
         }
-      }, 150); // Slightly longer delay to ensure DOM update
+      }, 150); 
     }
   }, [loadMoreMonthsEnd, loadMoreMonthsStart]);
 
-  // Set up scroll listeners
+  
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
