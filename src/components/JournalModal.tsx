@@ -72,13 +72,11 @@ const JournalModal: React.FC<JournalModalProps> = ({
     if (!isDragging) return;
     setIsDragging(false);
 
-    const threshold = 100; 
+    const threshold = window.innerWidth < 768 ? 50 : 100; // Smaller threshold on mobile
     if (Math.abs(dragOffset) > threshold) {
       if (dragOffset > 0 && currentIndex > 0) {
-        
         onNavigate(currentIndex - 1);
       } else if (dragOffset < 0 && currentIndex < entries.length - 1) {
-  
         onNavigate(currentIndex + 1);
       }
     }
@@ -120,7 +118,9 @@ const JournalModal: React.FC<JournalModalProps> = ({
   
   const getCardStyle = (index: number) => {
     const diff = index - currentIndex;
-    const baseTranslateX = diff * 280; 
+    // Responsive card spacing - smaller on mobile
+    const cardSpacing = window.innerWidth < 768 ? 300 : 280;
+    const baseTranslateX = diff * cardSpacing;
     const dragAdjustment = isDragging ? dragOffset : 0;
     
     let translateX = baseTranslateX + dragAdjustment;
@@ -129,23 +129,22 @@ const JournalModal: React.FC<JournalModalProps> = ({
     let zIndex = 100;
     
     if (diff === 0) {
-    
       scale = 1;
       opacity = 1;
       zIndex = 300;
     } else if (Math.abs(diff) === 1) {
-   
-      scale = 0.85;
+      scale = window.innerWidth < 768 ? 0.8 : 0.85; // Smaller scale on mobile
       opacity = 0.7;
       zIndex = 200;
     } else {
-    
-      scale = 0.7;
+      scale = window.innerWidth < 768 ? 0.6 : 0.7; // Smaller scale on mobile
       opacity = 0.3;
       zIndex = 100;
       
-      if (diff > 0) translateX = Math.min(translateX, 400);
-      if (diff < 0) translateX = Math.max(translateX, -400);
+      // Adjust bounds for mobile
+      const bound = window.innerWidth < 768 ? 300 : 400;
+      if (diff > 0) translateX = Math.min(translateX, bound);
+      if (diff < 0) translateX = Math.max(translateX, -bound);
     }
 
     return {
@@ -158,7 +157,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-2 sm:p-4"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -166,13 +165,13 @@ const JournalModal: React.FC<JournalModalProps> = ({
     >
       <div className="relative w-full max-w-6xl mx-auto h-full">
         {/* Close button */}
-        <div className="absolute top-4 right-4 z-50">
+        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50">
           <button
             onClick={onClose}
-            className="w-10 h-10 bg-white bg-opacity-90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-opacity-100 transition-all hover:scale-110"
+            className="w-8 h-8 sm:w-10 sm:h-10 bg-white bg-opacity-90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-opacity-100 transition-all hover:scale-110"
             aria-label="Close modal"
           >
-            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -193,10 +192,10 @@ const JournalModal: React.FC<JournalModalProps> = ({
           {entries.map((entry, index) => (
             <div
               key={entry.id || index}
-              className="absolute w-80 max-w-sm"
+              className="absolute w-72 sm:w-80 max-w-[85vw] sm:max-w-sm"
               style={getCardStyle(index)}
             >
-              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl">
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl">
                 {/* Image */}
                 <div className="relative aspect-[4/3] bg-gray-100">
                   <img
@@ -209,13 +208,13 @@ const JournalModal: React.FC<JournalModalProps> = ({
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   {/* Categories */}
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                     {entry.categories.map((category, catIndex) => (
                       <span
                         key={catIndex}
-                        className={`inline-flex items-center text-xs px-3 py-1 rounded-full font-medium ${
+                        className={`inline-flex items-center text-xs px-2 sm:px-3 py-1 rounded-full font-medium ${
                           catIndex === 0 ? 'bg-blue-100 text-blue-800' :
                           catIndex === 1 ? 'bg-purple-100 text-purple-800' :
                           catIndex === 2 ? 'bg-orange-100 text-orange-800' :
@@ -228,11 +227,11 @@ const JournalModal: React.FC<JournalModalProps> = ({
                   </div>
 
                   {/* Rating */}
-                  <div className="flex items-center mb-4">
+                  <div className="flex items-center mb-3 sm:mb-4">
                     {[...Array(5)].map((_, i) => (
                       <span
                         key={i}
-                        className={`text-lg ${
+                        className={`text-base sm:text-lg ${
                           i < Math.floor(entry.rating) 
                             ? 'text-yellow-400' 
                             : 'text-gray-300'
@@ -244,12 +243,12 @@ const JournalModal: React.FC<JournalModalProps> = ({
                   </div>
 
                   {/* Date */}
-                  <h2 className="text-xl font-bold text-gray-900 mb-3">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
                     {formatDate(entry.date)}
                   </h2>
 
                   {/* Description */}
-                  <p className="text-gray-700 text-sm leading-relaxed mb-6 line-clamp-3">
+                  <p className="text-gray-700 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6 line-clamp-3">
                     {entry.description}
                   </p>
 
@@ -259,7 +258,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
                       e.stopPropagation();
                       onClose();
                     }}
-                    className="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-lg"
+                    className="w-full py-2.5 sm:py-3 bg-gray-800 hover:bg-gray-900 text-white text-sm sm:text-base font-medium rounded-lg sm:rounded-xl transition-all duration-200 hover:shadow-lg"
                   >
                     View full Post
                   </button>
@@ -269,14 +268,14 @@ const JournalModal: React.FC<JournalModalProps> = ({
           ))}
         </div>
 
-        {/* Navigation arrows */}
+        {/* Navigation arrows - Hidden on very small screens */}
         {currentIndex > 0 && (
           <button
             onClick={() => onNavigate(currentIndex - 1)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white bg-opacity-90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-opacity-100 transition-all hover:scale-110 z-40"
+            className="hidden sm:flex absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white bg-opacity-90 backdrop-blur-sm rounded-full items-center justify-center shadow-lg hover:bg-opacity-100 transition-all hover:scale-110 z-40"
             aria-label="Previous entry"
           >
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -285,30 +284,16 @@ const JournalModal: React.FC<JournalModalProps> = ({
         {currentIndex < entries.length - 1 && (
           <button
             onClick={() => onNavigate(currentIndex + 1)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white bg-opacity-90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-opacity-100 transition-all hover:scale-110 z-40"
+            className="hidden sm:flex absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white bg-opacity-90 backdrop-blur-sm rounded-full items-center justify-center shadow-lg hover:bg-opacity-100 transition-all hover:scale-110 z-40"
             aria-label="Next entry"
           >
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         )}
 
-        {/* Progress indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-2 z-40">
-          {entries.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => onNavigate(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                index === currentIndex 
-                  ? 'bg-white w-8' 
-                  : 'bg-white bg-opacity-50 hover:bg-opacity-75'
-              }`}
-              aria-label={`Go to entry ${index + 1}`}
-            />
-          ))}
-        </div>
+
       </div>
     </div>
   );
