@@ -111,11 +111,11 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
     }
   };
 
-  const goToIndex = (index: number) => {
-    if (index >= 0 && index < total) {
-      handleNavigate(index);
-    }
-  };
+  // const goToIndex = (index: number) => {
+  //   if (index >= 0 && index < total) {
+  //     handleNavigate(index);
+  //   }
+  // };
 
   return (
     <div
