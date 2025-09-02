@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Month, EntriesByDate } from '../types/calendar';
 import { generateMonths } from '../utils/dateUtils';
@@ -36,8 +37,7 @@ export const useInfiniteScroll = ({
     const startMonth = initialMonth - bufferMonths;
     const totalMonths = bufferMonths * 2 + 1; // Total months to generate
     
-    console.log(`useInfiniteScroll: Generating ${totalMonths} months starting from ${startMonth} (${initialYear}-${startMonth})`);
-    console.log(`useInfiniteScroll: Target month is ${initialYear}-${initialMonth} (${initialMonth})`);
+ 
     
     const initialMonths = generateMonths(
       initialYear,
@@ -46,23 +46,23 @@ export const useInfiniteScroll = ({
       entriesByDate
     );
     
-    console.log(`useInfiniteScroll: Generated months:`, initialMonths.map(m => `${m.year}-${m.month}`));
+    
     
     setMonths(initialMonths);
     setCurrentVisibleMonth({ year: initialYear, month: initialMonth });
     
-    // Scroll to current month after a short delay to ensure DOM is ready
+    
     setTimeout(() => {
       if (containerRef.current) {
         const currentMonthElement = containerRef.current.querySelector(`[data-month="${initialYear}-${initialMonth}"]`);
         if (currentMonthElement) {
-          console.log(`useInfiniteScroll: Scrolling to current month ${initialYear}-${initialMonth}`);
+       
           currentMonthElement.scrollIntoView({ 
             behavior: 'smooth', 
             block: 'center' 
           });
         } else {
-          console.log(`useInfiniteScroll: Current month element not found for ${initialYear}-${initialMonth}`);
+          console.warn(`useInfiniteScroll: Current month element not found for ${initialYear}-${initialMonth}`);
         }
       }
     }, 100);

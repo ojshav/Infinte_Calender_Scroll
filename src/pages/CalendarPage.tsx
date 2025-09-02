@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import type { EntriesByDate } from '../types/calendar';
@@ -10,29 +11,28 @@ import { formatMonthYear } from '../utils/dateUtils';
 import { loadJournalData } from '../utils/datasetLoader';
 
 interface CalendarPageProps {
-  journalDataSource?: string | any[]; // URL or direct data array
+  journalDataSource?: string | any[]; 
 }
 
 const CalendarPage: React.FC<CalendarPageProps> = ({ 
   journalDataSource = [] 
 }) => {
-  // State management
+ 
   const [entriesByDate, setEntriesByDate] = useState<EntriesByDate>({});
   const [currentVisibleMonth, setCurrentVisibleMonth] = useState<{ year: number; month: number } | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [jumpToYearFunction, setJumpToYearFunction] = useState<((year: number, month?: number) => void) | null>(null);
   
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEntries, setSelectedEntries] = useState<JournalEntry[]>([]);
   const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
 
-  // Get current month and year dynamically
+ 
   const now = new Date();
   const initialYear = now.getFullYear();
-  const initialMonth = now.getMonth(); // Current month (0-based)
+  const initialMonth = now.getMonth(); 
 
-  // Load journal data on mount
+
   useEffect(() => {
     const loadData = async () => {
       setIsDataLoading(true);
@@ -40,7 +40,6 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
         const data = await loadJournalData(journalDataSource);
         setEntriesByDate(data);
       } catch (error) {
-        console.error('Failed to load journal data:', error);
         setEntriesByDate({});
       } finally {
         setIsDataLoading(false);
@@ -50,10 +49,10 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
     loadData();
   }, [journalDataSource]);
 
-  // Set initial visible month
+ 
   useEffect(() => {
     if (!currentVisibleMonth) {
-      console.log(`CalendarPage: Setting initial visible month to ${initialYear}-${initialMonth} (${formatMonthYear(initialYear, initialMonth)})`);
+     
       setCurrentVisibleMonth({ year: initialYear, month: initialMonth });
     }
   }, [initialYear, initialMonth, currentVisibleMonth]);
@@ -93,13 +92,13 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
     setCurrentEntryIndex(newIndex);
   }, []);
 
-  // Update current visible month from CalendarGrid
+
   const handleVisibleMonthChange = useCallback((year: number, month: number) => {
-    console.log(`CalendarPage: Visible month changed to ${year}-${month} (${formatMonthYear(year, month)})`);
+   
     setCurrentVisibleMonth({ year, month });
   }, []);
 
-  // Handle jump to year from Header
+ 
   const handleJumpToYear = useCallback((year: number, month?: number) => {
     if (jumpToYearFunction) {
       jumpToYearFunction(year, month);
@@ -122,7 +121,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
   if (isDataLoading) {
     return (
       <div className="flex flex-col h-screen bg-gray-50">
-        <Header currentMonth={currentMonthDisplay} onJumpToYear={handleJumpToYear} />
+        {/* <Header currentMonth={currentMonthDisplay} onJumpToYear={handleJumpToYear} /> */}
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
@@ -135,10 +134,10 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header with current month */}
-      <Header currentMonth={currentMonthDisplay} onJumpToYear={handleJumpToYear} />
       
-      {/* Main calendar grid */}
+      <Header currentMonth={currentMonthDisplay} onJumpToYear={handleJumpToYear} />
+
+    
       <CalendarGrid
         initialYear={initialYear}
         initialMonth={initialMonth}
@@ -148,7 +147,6 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
         onJumpToYear={handleSetJumpToYearFunction}
       />
       
-      {/* Journal Modal */}
       {isModalOpen && selectedEntries.length > 0 && (
         <JournalModal
           entries={selectedEntries}
@@ -160,5 +158,6 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
     </div>
   );
 };
+
 
 export default CalendarPage;

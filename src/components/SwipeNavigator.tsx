@@ -1,3 +1,4 @@
+
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import type { SwipeNavigatorProps } from '../types/props';
 
@@ -51,33 +52,31 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // Handle navigation with animation
   const handleNavigate = (newIndex: number) => {
     if (isAnimating || newIndex === currentIndex) return;
     
     setIsAnimating(true);
     onNavigate(newIndex);
     
-    // Reset animation state after transition
+    
     setTimeout(() => {
       setIsAnimating(false);
     }, 300);
   };
 
-  // Handle touch start
   const handleTouchStart = (e: React.TouchEvent) => {
     if (isAnimating) return;
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
 
-  // Handle touch move
+ 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (isAnimating) return;
     setTouchEnd(e.targetTouches[0].clientX);
   };
 
-  // Handle touch end and detect swipe
+  
   const handleTouchEnd = () => {
     if (!touchStart || !touchEnd || isAnimating) return;
     
@@ -93,12 +92,12 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
       handleNavigate(currentIndex - 1);
     }
     
-    // Reset touch state
+  
     setTouchStart(null);
     setTouchEnd(null);
   };
 
-  // Navigation handlers
+  
   const goToPrevious = () => {
     if (currentIndex > 0) {
       handleNavigate(currentIndex - 1);
@@ -111,11 +110,7 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
     }
   };
 
-  // const goToIndex = (index: number) => {
-  //   if (index >= 0 && index < total) {
-  //     handleNavigate(index);
-  //   }
-  // };
+
 
   return (
     <div
@@ -127,10 +122,10 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
     >
       
 
-      {/* Navigation buttons - only show if multiple entries */}
+      
       {total > 1 && (
         <>
-          {/* Previous button (Older entry) */}
+     
           <button
             onClick={goToPrevious}
             disabled={currentIndex === 0 || isAnimating}
@@ -145,7 +140,7 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
             <span className="sr-only">Older entry</span>
           </button>
 
-          {/* Next button (Newer entry) */}
+        
           <button
             onClick={goToNext}
             disabled={currentIndex === total - 1 || isAnimating}
@@ -164,7 +159,7 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
 
       
       
-      {/* Render children content with smooth slide transitions */}
+     
       <div className="w-full h-full flex items-center justify-center">
         <div 
           key={currentIndex}

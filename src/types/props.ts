@@ -1,7 +1,8 @@
 import type{ Day } from "./calendar";
 import type{ JournalEntry  } from "./journal";
+
 export interface HeaderProps {
-  currentMonth: string; // e.g. "September 2025"
+  currentMonth: string; 
   onJumpToYear?: (year: number, month?: number) => void;
 }
 

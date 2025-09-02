@@ -3,43 +3,34 @@ import type { DayCellProps } from '../types/props';
 import { isToday } from '../utils/dateUtils';
 
 const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
-  const { date, isCurrentMonth, journalEntries } = day;
-  const dayNumber = date.getDate();
-  // Only show entries if this day is in the current month
-  const hasEntries = isCurrentMonth && journalEntries.length > 0;
-  const isTodayDate = isToday(date);
-  
-  // Calculate display state
-  const isClickable = hasEntries;
-  
-  // Get top entry for preview (only if it's current month)
-  const topEntry = isCurrentMonth && journalEntries.length > 0 ? journalEntries[0] : null;
+const {date, isCurrentMonth,journalEntries} = day;
+const daynumber = date.getDate();
+const hasEntries = isCurrentMonth && journalEntries.length > 0;
+const isTodayDate = isToday(date);
 
-  const handleClick = () => {
+const isClickable = hasEntries;
+
+const topEntry = isCurrentMonth && journalEntries.length > 0  ? journalEntries[0] : null;
+
+const handleClick = () => {
     if (isClickable) {
-      onClick(journalEntries);
+        onClick(journalEntries);
     }
-  };
-
-  return (
-    <div
-      className={`
-        relative min-h-16 sm:min-h-20 p-1 sm:p-2 border-r border-b border-gray-200 last:border-r-0
-        ${isClickable ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}
-        ${!isCurrentMonth ? 'bg-gray-25' : 'bg-white'}
-      `}
-      onClick={handleClick}
-      role={isClickable ? 'button' : undefined}
-      tabIndex={isClickable ? 0 : -1}
-      onKeyDown={(e) => {
+};
+return (
+    <div className={`relative min-h-16 sm:min-h20 p-1 sm:p-1 border-r border-b border-gray-200 last:border-r-0 ${isClickable ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}
+    ${!isCurrentMonth ? 'bg-gray-25' : 'bg-white'}`}
+    onClick={handleClick}
+    role={isClickable ? 'button' : undefined}
+    tabIndex={isClickable ? 0 : -1}
+    onKeyDown={(e) => {
         if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
-          handleClick();
+            e.preventDefault();
+            handleClick();
         }
-      }}
+    }}
     >
-      {/* Day number */}
-      <div className="flex justify-between items-start mb-1">
+   <div className="flex justify-between items-start mb-1">
         <span
           className={`
             text-xs sm:text-sm font-medium
@@ -47,31 +38,25 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
             ${isTodayDate ? 'text-blue-600 font-semibold' : ''}
           `}
         >
-          {dayNumber}
+          {daynumber}
         </span>
-        
-        {/* Today indicator */}
-        {isTodayDate && (
+      {isTodayDate && (
           <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full"></div>
         )}
       </div>
-      
-      {/* Entry indicator and image - ONLY show for current month */}
-      {hasEntries && topEntry && (
-        <div className="space-y-1">
-          {/* Entry count indicator */}
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center space-x-1">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full"></div>
-              {journalEntries.length > 1 && (
-                <span className="text-xs text-gray-600 hidden sm:block">
-                  +{journalEntries.length - 1}
-                </span>
-              )}
-            </div>
-            
-            {/* Rating stars for top entry */}
-            <div className="flex items-center">
+
+    {hasEntries && topEntry && (
+        <div className='space-y-1'>
+            <div className="flex items-center justify-between mb-1">
+                <div className='flex items-center space-x-1'>
+                    <div className='w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full'></div>
+                {journalEntries.length > 1 && (
+                    <span className='text-xs text-gray-600 hidden sm:block'>
+                        {journalEntries.length} entries
+                    </span>
+                )}
+                </div>
+<div className="flex items-center">
               {[...Array(5)].map((_, i) => (
                 <span
                   key={i}
@@ -85,10 +70,8 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
                 </span>
               ))}
             </div>
-          </div>
-          
-          {/* Image thumbnail */}
-          <div className="relative">
+        </div>
+<div className="relative">
             <img
               src={topEntry.imgUrl}
               alt="Journal entry"
@@ -97,17 +80,13 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
                 e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03NSA3NUgxMjVWMTI1SDc1Vjc1WiIgZmlsbD0iI0Q0RDRENyIvPgo8L3N2Zz4K';
               }}
             />
-            
-            {/* Multiple entries overlay */}
-            {journalEntries.length > 1 && (
+{journalEntries.length > 1 && (
               <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 bg-black bg-opacity-70 text-white text-xs px-1 py-0.5 rounded">
                 +{journalEntries.length - 1}
               </div>
             )}
           </div>
-          
-          {/* Categories - only show on larger screens */}
-          {topEntry.categories.length > 0 && (
+{topEntry.categories.length > 0 && (
             <div className="hidden sm:flex flex-wrap gap-1">
               {topEntry.categories.slice(0, 2).map((category, index) => (
                 <span
@@ -126,9 +105,8 @@ const DayCell: React.FC<DayCellProps> = ({ day, onClick }) => {
           )}
         </div>
       )}
-      
-      {/* Hover effect overlay */}
-      {isClickable && (
+
+{isClickable && (
         <div className="absolute inset-0 bg-blue-50 opacity-0 hover:opacity-20 transition-opacity pointer-events-none"></div>
       )}
     </div>
