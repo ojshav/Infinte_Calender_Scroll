@@ -62,14 +62,11 @@ const JournalModal: React.FC<JournalModalProps> = ({
     >
       {/* Modal container */}
       <div className="relative w-full max-w-6xl mx-auto h-full max-h-[90vh]">
-        {/* Header with close button and title */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">
-            All Journal Entries ({entries.length})
-          </h2>
+        {/* Header with close button */}
+        <div className="flex items-center justify-end mb-6">
           <button
             onClick={onClose}
-            className="w-10 h-10 bg-white bg-opacity-90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-opacity-100 transition-all hover:scale-110"
+            className="w-10 h-10 bg-white bg-opacity-90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-opacity-100 transition-all hover:scale-110 z-10"
             aria-label="Close modal"
           >
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,224 +75,196 @@ const JournalModal: React.FC<JournalModalProps> = ({
           </button>
         </div>
 
-        {/* SwipeNavigator wrapper for centered card focus */}
+        {/* SwipeNavigator wrapper */}
         <SwipeNavigator
           currentIndex={currentIndex}
           total={entries.length}
           onNavigate={onNavigate}
         >
-          {/* Main centered card */}
-          <div className="w-full max-w-md mx-auto">
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ease-out transform hover:scale-[1.02]">
+          {/* Main centered card - matching the image design */}
+          <div className="w-full max-w-sm mx-auto">
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden transition-all duration-300 ease-out transform hover:scale-[1.02]">
               {/* Image section */}
-              <div className="relative h-80 bg-gray-100">
+              <div className="relative aspect-[4/3] bg-gray-100">
                 <img
                   src={entries[currentIndex].imgUrl}
                   alt="Journal entry"
                   className="w-full h-full object-cover"
                   onError={handleImageError}
                 />
-                
-                {/* Gradient overlay at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/50 to-transparent"></div>
-                
               </div>
 
               {/* Content section */}
               <div className="p-6">
-                {/* Date and rating row */}
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900">{formatDate(entries[currentIndex].date)}</h2>
-                  <div className="flex items-center space-x-1">
-                    {[...Array(5)].map((_, i) => (
-                      <span
-                        key={i}
-                        className={`text-lg ${
-                          i < Math.floor(entries[currentIndex].rating) 
-                            ? 'text-blue-500' 
-                            : 'text-gray-300'
-                        }`}
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
+                {/* Categories with colored backgrounds */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {entries[currentIndex].categories.map((category, index) => (
+                    <span
+                      key={index}
+                      className={`inline-flex items-center text-xs px-3 py-1 rounded-full font-medium ${
+                        index === 0 ? 'bg-blue-100 text-blue-800' :
+                        index === 1 ? 'bg-purple-100 text-purple-800' :
+                        index === 2 ? 'bg-orange-100 text-orange-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {category}
+                    </span>
+                  ))}
                 </div>
 
-                {/* Categories */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {entries[currentIndex].categories.map((category, index) => {
-                    const getIcon = (cat: string) => {
-                      const lowerCat = category.toLowerCase();
-                      if (lowerCat.includes('moisture') || lowerCat.includes('hydration')) return '💧';
-                      if (lowerCat.includes('protein')) return '🥚';
-                      if (lowerCat.includes('oil')) return '🫧';
-                      if (lowerCat.includes('growth')) return '🌱';
-                      if (lowerCat.includes('repair')) return '🔧';
-                      if (lowerCat.includes('style') || lowerCat.includes('braid')) return '✨';
-                      if (lowerCat.includes('wash')) return '🚿';
-                      if (lowerCat.includes('color')) return '🎨';
-                      return '📝';
-                    };
-                    
-                    return (
-                      <span
-                        key={index}
-                        className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-sm px-3 py-1.5 rounded-full"
-                      >
-                        <span>{getIcon(category)}</span>
-                        <span>{category}</span>
-                      </span>
-                    );
-                  })}
+                {/* Rating stars */}
+                <div className="flex items-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <span
+                      key={i}
+                      className={`text-lg ${
+                        i < Math.floor(entries[currentIndex].rating) 
+                          ? 'text-yellow-400' 
+                          : 'text-gray-300'
+                      }`}
+                    >
+                      ★
+                    </span>
+                  ))}
                 </div>
+
+                {/* Date */}
+                <h2 className="text-xl font-bold text-gray-900 mb-3">
+                  {formatDate(entries[currentIndex].date)}
+                </h2>
 
                 {/* Description */}
-                <p className="text-gray-700 leading-relaxed mb-6">
+                <p className="text-gray-700 text-sm leading-relaxed mb-6 line-clamp-3">
                   {entries[currentIndex].description}
                 </p>
-
-               
 
                 {/* View Full Post button */}
                 <button
                   onClick={onClose}
-                  className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors hover:bg-gray-200"
+                  className="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-lg"
                 >
-                  View Full Post
+                  View full Post
                 </button>
               </div>
             </div>
           </div>
         </SwipeNavigator>
 
-        {/* Carousel cards with proper depth effect */}
+        {/* Side cards layout */}
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
           <div className="flex items-center space-x-8">
-            {/* Previous cards (left side) - progressively smaller and darker */}
+            {/* Previous card (left side) */}
             {currentIndex > 0 && (
-              <>
-                {/* Immediate left card */}
-                <div className="transform -translate-x-20 opacity-60 scale-90 pointer-events-none">
-                  <div className="w-72 h-96 bg-white rounded-xl shadow-lg overflow-hidden">
-                    {/* Image section */}
-                    <div className="relative h-48 bg-gray-100">
-                      <img
-                        src={entries[currentIndex - 1].imgUrl}
-                        alt="Journal entry"
-                        className="w-full h-full object-cover"
-                        onError={handleImageError}
-                      />
-                      {/* Gradient overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/50 to-transparent"></div>
-                      {/* Entry number */}
-                      <div className="absolute top-3 left-3 bg-white bg-opacity-90 backdrop-blur-sm px-2 py-1 rounded-full shadow-lg">
-                        <span className="text-xs font-medium text-gray-700">
-                          {currentIndex}
+              <div className="transform -translate-x-20 opacity-60 scale-75 pointer-events-none">
+                <div className="w-72 bg-white rounded-3xl shadow-xl overflow-hidden">
+                  {/* Image section */}
+                  <div className="relative aspect-[4/3] bg-gray-100">
+                    <img
+                      src={entries[currentIndex - 1].imgUrl}
+                      alt="Journal entry"
+                      className="w-full h-full object-cover"
+                      onError={handleImageError}
+                    />
+                  </div>
+                  {/* Content section */}
+                  <div className="p-4">
+                    {/* Categories */}
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {entries[currentIndex - 1].categories.slice(0, 2).map((category, index) => (
+                        <span
+                          key={index}
+                          className={`inline-flex items-center text-xs px-2 py-1 rounded-full font-medium ${
+                            index === 0 ? 'bg-blue-100 text-blue-800' :
+                            'bg-purple-100 text-purple-800'
+                          }`}
+                        >
+                          {category}
                         </span>
-                      </div>
+                      ))}
                     </div>
-                    {/* Content section */}
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">{formatDate(entries[currentIndex - 1].date)}</h3>
-                      <p className="text-gray-700 text-sm line-clamp-2">{entries[currentIndex - 1].description}</p>
+                    {/* Rating */}
+                    <div className="flex items-center mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <span
+                          key={i}
+                          className={`text-sm ${
+                            i < Math.floor(entries[currentIndex - 1].rating) 
+                              ? 'text-yellow-400' 
+                              : 'text-gray-300'
+                          }`}
+                        >
+                          ★
+                        </span>
+                      ))}
                     </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      {formatDate(entries[currentIndex - 1].date)}
+                    </h3>
+                    <p className="text-gray-700 text-sm line-clamp-2">
+                      {entries[currentIndex - 1].description}
+                    </p>
                   </div>
                 </div>
-                
-                {/* Far left card (if exists) */}
-                {currentIndex > 1 && (
-                  <div className="transform -translate-x-32 opacity-40 scale-75 pointer-events-none">
-                    <div className="w-64 h-80 bg-white rounded-xl shadow-lg overflow-hidden">
-                      {/* Image section */}
-                      <div className="relative h-40 bg-gray-100">
-                        <img
-                          src={entries[currentIndex - 2].imgUrl}
-                          alt="Journal entry"
-                          className="w-full h-full object-cover"
-                          onError={handleImageError}
-                        />
-                        {/* Gradient overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        {/* Entry number */}
-                        <div className="absolute top-2 left-2 bg-white bg-opacity-90 backdrop-blur-sm px-2 py-1 rounded-full shadow-lg">
-                          <span className="text-xs font-medium text-gray-700">
-                            {currentIndex - 1}
-                          </span>
-                        </div>
-                      </div>
-                      {/* Content section */}
-                      <div className="p-3">
-                        <h3 className="text-base font-bold text-gray-900 mb-1">{formatDate(entries[currentIndex - 2].date)}</h3>
-                        <p className="text-gray-700 text-xs line-clamp-2">{entries[currentIndex - 2].description}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
+              </div>
             )}
             
-            {/* Next cards (right side) - progressively smaller and darker */}
+            {/* Current card placeholder (invisible, just for spacing) */}
+            <div className="w-80 opacity-0 pointer-events-none"></div>
+            
+            {/* Next card (right side) */}
             {currentIndex < entries.length - 1 && (
-              <>
-                {/* Immediate right card */}
-                <div className="transform translate-x-20 opacity-60 scale-90 pointer-events-none">
-                  <div className="w-72 h-96 bg-white rounded-xl shadow-lg overflow-hidden">
-                    {/* Image section */}
-                    <div className="relative h-48 bg-gray-100">
-                      <img
-                        src={entries[currentIndex + 1].imgUrl}
-                        alt="Journal entry"
-                        className="w-full h-full object-cover"
-                        onError={handleImageError}
-                      />
-                      {/* Gradient overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/50 to-transparent"></div>
-                      {/* Entry number */}
-                      <div className="absolute top-3 left-3 bg-white bg-opacity-90 backdrop-blur-sm px-2 py-1 rounded-full shadow-lg">
-                        <span className="text-xs font-medium text-gray-700">
-                          {currentIndex + 2}
+              <div className="transform translate-x-20 opacity-60 scale-75 pointer-events-none">
+                <div className="w-72 bg-white rounded-3xl shadow-xl overflow-hidden">
+                  {/* Image section */}
+                  <div className="relative aspect-[4/3] bg-gray-100">
+                    <img
+                      src={entries[currentIndex + 1].imgUrl}
+                      alt="Journal entry"
+                      className="w-full h-full object-cover"
+                      onError={handleImageError}
+                    />
+                  </div>
+                  {/* Content section */}
+                  <div className="p-4">
+                    {/* Categories */}
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {entries[currentIndex + 1].categories.slice(0, 2).map((category, index) => (
+                        <span
+                          key={index}
+                          className={`inline-flex items-center text-xs px-2 py-1 rounded-full font-medium ${
+                            index === 0 ? 'bg-blue-100 text-blue-800' :
+                            'bg-purple-100 text-purple-800'
+                          }`}
+                        >
+                          {category}
                         </span>
-                      </div>
+                      ))}
                     </div>
-                    {/* Content section */}
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">{formatDate(entries[currentIndex + 1].date)}</h3>
-                      <p className="text-gray-700 text-sm line-clamp-2">{entries[currentIndex + 1].description}</p>
+                    {/* Rating */}
+                    <div className="flex items-center mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <span
+                          key={i}
+                          className={`text-sm ${
+                            i < Math.floor(entries[currentIndex + 1].rating) 
+                              ? 'text-yellow-400' 
+                              : 'text-gray-300'
+                          }`}
+                        >
+                          ★
+                        </span>
+                      ))}
                     </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      {formatDate(entries[currentIndex + 1].date)}
+                    </h3>
+                    <p className="text-gray-700 text-sm line-clamp-2">
+                      {entries[currentIndex + 1].description}
+                    </p>
                   </div>
                 </div>
-                
-                {/* Far right card (if exists) */}
-                {currentIndex < entries.length - 2 && (
-                  <div className="transform translate-x-32 opacity-40 scale-75 pointer-events-none">
-                    <div className="w-64 h-80 bg-white rounded-xl shadow-lg overflow-hidden">
-                      {/* Image section */}
-                      <div className="relative h-40 bg-gray-100">
-                        <img
-                          src={entries[currentIndex + 2].imgUrl}
-                          alt="Journal entry"
-                          className="w-full h-full object-cover"
-                          onError={handleImageError}
-                        />
-                        {/* Gradient overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        {/* Entry number */}
-                        <div className="absolute top-2 left-2 bg-white bg-opacity-90 backdrop-blur-sm px-2 py-1 rounded-full shadow-lg">
-                          <span className="text-xs font-medium text-gray-700">
-                            {currentIndex + 3}
-                          </span>
-                        </div>
-                      </div>
-                      {/* Content section */}
-                      <div className="p-3">
-                        <h3 className="text-base font-bold text-gray-900 mb-1">{formatDate(entries[currentIndex + 2].date)}</h3>
-                        <p className="text-gray-700 text-xs line-clamp-2">{entries[currentIndex + 2].description}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
+              </div>
             )}
           </div>
         </div>

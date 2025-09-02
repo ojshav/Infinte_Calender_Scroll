@@ -119,24 +119,24 @@ html {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: #f1f5f9;
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: #cbd5e1;
   border-radius: 4px;
-  transition: background 0.3s ease;
+  transition: background 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: #94a3b8;
 }
 
 /* Firefox scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
 /* Line clamp utility for text truncation */
@@ -145,4 +145,28 @@ html {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Solid background utilities to override any transparency */
+.solid-bg {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
+.solid-bg-gray {
+  background: #f9fafb !important;
+  background-color: #f9fafb !important;
+}
+
+.solid-bg-white {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
+/* Ensure no transparency in card elements */
+.card-solid {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
