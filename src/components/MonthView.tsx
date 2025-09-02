@@ -30,7 +30,7 @@ const MonthView: React.FC<ExtendedMonthViewProps> = ({
 
   return (
     <div className="mb-8 animate-fade-in-up">
- {/* month header */}
+
       <div className="mb-4 px-4">
         <h2 className="text-xl font-semibold text-gray-900">
           {formatMonthYear(year, month)}

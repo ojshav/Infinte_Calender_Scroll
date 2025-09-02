@@ -20,7 +20,7 @@ const generateEntryId = (entry: RawJournalEntry, index: number): string => {
 
 const transformRawEntry = (raw: RawJournalEntry, index: number): JournalEntry => ({
   id: generateEntryId(raw, index),
-  date: parseIndianDateToISO(raw.date), // DD/MM/YYYY → YYYY-MM-DD
+  date: parseIndianDateToISO(raw.date), 
   imgUrl: raw.imgUrl,
   rating: raw.rating,
   categories: raw.categories,
@@ -79,7 +79,7 @@ export const loadJournalData = async (
 
 
 export const getEntriesForDate = (date: Date, entriesByDate: EntriesByDate): JournalEntry[] => {
-  const isoDate = date.toISOString().split("T")[0]; // yyyy-mm-dd
+  const isoDate = date.toISOString().split("T")[0]; 
   return entriesByDate[isoDate] || [];
 };
 

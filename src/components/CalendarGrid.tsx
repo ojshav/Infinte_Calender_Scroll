@@ -20,7 +20,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
   onDayClick,
   onJumpToYear
 }) => {
-  // Use infinite scroll hook for smooth month navigation
+
   const { months, currentVisibleMonth, containerRef, isLoading, jumpToYear } = useInfiniteScroll({
     initialYear,
     initialMonth,
@@ -28,14 +28,14 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
     bufferMonths: 3
   });
 
-  // Notify parent of visible month changes
+
   useEffect(() => {
     if (currentVisibleMonth && onVisibleMonthChange) {
       onVisibleMonthChange(currentVisibleMonth.year, currentVisibleMonth.month);
     }
   }, [currentVisibleMonth, onVisibleMonthChange]);
 
-  // Expose jumpToYear function to parent
+
   useEffect(() => {
     if (onJumpToYear) {
       onJumpToYear(jumpToYear);
@@ -44,7 +44,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
 
   return (
     <div className="flex-1 overflow-hidden">
-      {/* Scroll container for infinite months */}
+     
       <div
         ref={containerRef}
         className="h-full overflow-y-auto scroll-smooth custom-scrollbar"
@@ -53,7 +53,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {/* Loading indicator at top - only show when loading previous months */}
+
         {isLoading && (
           <div className="flex justify-center py-3 sm:py-4 animate-fade-in">
             <div className="flex items-center space-x-2 text-gray-500 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-200">
@@ -63,7 +63,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
           </div>
         )}
         
-        {/* Calendar months */}
+      
         <div className="px-2 sm:px-4 py-3 sm:py-6 space-y-4 sm:space-y-8">
           {months.map((month, index) => (
             <div
@@ -81,7 +81,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
                 animationFillMode: 'both'
               }}
             >
-              {/* Month content */}
+      
               <div className="p-2 sm:p-4">
                 <MonthView
                   year={month.year}
@@ -94,7 +94,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
           ))}
         </div>
         
-        {/* Loading indicator at bottom - only show when loading more months */}
+     
         {isLoading && (
           <div className="flex justify-center py-3 sm:py-4 animate-fade-in">
             <div className="flex items-center space-x-2 text-gray-500 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-200">
@@ -104,7 +104,7 @@ const CalendarGrid: React.FC<ExtendedCalendarGridProps> = ({
           </div>
         )}
         
-        {/* Scroll padding for better UX */}
+ 
         <div className="h-16 sm:h-20"></div>
       </div>
     </div>

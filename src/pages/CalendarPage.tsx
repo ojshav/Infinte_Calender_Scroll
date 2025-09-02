@@ -57,20 +57,20 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
     }
   }, [initialYear, initialMonth, currentVisibleMonth]);
 
-  // Handle day cell click
+
   const handleDayClick = useCallback((entries: JournalEntry[]) => {
     if (entries.length > 0) {
-      // Get ALL journal entries from the entire dataset and sort chronologically
+
       const allEntries = Object.values(entriesByDate).flat();
       
-      // Sort entries by date (oldest to newest)
+      
       const sortedEntries = allEntries.sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
         return dateA.getTime() - dateB.getTime();
       });
       
-      // Find the index of the clicked day's first entry in the sorted array
+      
       const clickedDayFirstEntry = entries[0];
       const startIndex = sortedEntries.findIndex(entry => entry.id === clickedDayFirstEntry.id);
       
@@ -105,12 +105,12 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
     }
   }, [jumpToYearFunction]);
 
-  // Handle setting jump to year function from CalendarGrid
+  
   const handleSetJumpToYearFunction = useCallback((jumpFunction: (year: number, month?: number) => void) => {
     setJumpToYearFunction(() => jumpFunction);
   }, []);
 
-  // Format current month for header
+  
   const currentMonthDisplay = useMemo(() => {
     return currentVisibleMonth 
       ? formatMonthYear(currentVisibleMonth.year, currentVisibleMonth.month)
@@ -121,7 +121,7 @@ const CalendarPage: React.FC<CalendarPageProps> = ({
   if (isDataLoading) {
     return (
       <div className="flex flex-col h-screen bg-gray-50">
-        {/* <Header currentMonth={currentMonthDisplay} onJumpToYear={handleJumpToYear} /> */}
+ 
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
