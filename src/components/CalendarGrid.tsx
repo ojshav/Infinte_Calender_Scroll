@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect } from 'react';
 import type { JournalEntry } from '../types/journal';
 import MonthView from './MonthView';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';

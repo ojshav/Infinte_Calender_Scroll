@@ -1,4 +1,3 @@
-import React from 'react';
 import CalendarPage from './pages/CalendarPage';
 import './App.css';
 import journalEntries from './data/journalEntries.json';

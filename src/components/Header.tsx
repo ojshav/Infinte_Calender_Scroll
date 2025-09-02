@@ -19,11 +19,11 @@ const Header: React.FC<HeaderProps> = ({ currentMonth, onJumpToYear }) => {
 
   // Get current date for "today" reference
   const today = new Date();
-  const todayStr = today.toLocaleDateString('en-US', { 
-    month: 'long', 
-    day: 'numeric',
-    year: 'numeric'
-  });
+  // const todayStr = today.toLocaleDateString('en-US', { 
+  //   month: 'long', 
+  //   day: 'numeric',
+  //   year: 'numeric'
+  // });
 
   // Handle year jump
   const handleYearJump = () => {
