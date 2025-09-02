@@ -227,7 +227,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
                   </div>
            
                   <div className="p-4">
-                    {/* Categories */}
+                   
                     <div className="flex flex-wrap gap-1 mb-3">
                       {entries[currentIndex + 1].categories.slice(0, 2).map((category, index) => (
                         <span
