@@ -43,26 +43,6 @@ const Header: React.FC<HeaderProps> = ({ currentMonth, onJumpToYear }) => {
             Today
           </button>
         </div>
-
-        
-        <div className="mt-3 flex items-center justify-center">
-          <div className="flex items-center space-x-2 text-xs text-gray-500">
-            <div className="flex items-center space-x-1">
-              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-              <span>Scroll to move between months</span>
-            </div>
-            <span>•</span>
-            <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Green = Journal entries</span>
-            </div>
-            <span>•</span>
-            <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span>Starts at current month</span>
-            </div>
-          </div>
-        </div>
       </div>
     </header>
   );
