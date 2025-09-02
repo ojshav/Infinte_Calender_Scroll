@@ -12,9 +12,16 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragDeltaX, setDragDeltaX] = useState(0);
+  const gestureStartXRef = useRef<number | null>(null);
+  const gestureStartTimeRef = useRef<number>(0);
+  const lastMoveXRef = useRef<number>(0);
+  const lastMoveTimeRef = useRef<number>(0);
   
  
-  const minSwipeDistance = 20;
+  const minSwipeDistance = 40; // px
+  const minSwipeVelocity = 0.35; // px/ms
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -66,35 +73,72 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (isAnimating) return;
+    const x = e.targetTouches[0].clientX;
     setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+    setTouchStart(x);
+    gestureStartXRef.current = x;
+    gestureStartTimeRef.current = performance.now();
+    lastMoveXRef.current = x;
+    lastMoveTimeRef.current = gestureStartTimeRef.current;
+    setIsDragging(true);
+    setDragDeltaX(0);
   };
 
  
   const handleTouchMove = (e: React.TouchEvent) => {
     if (isAnimating) return;
-    setTouchEnd(e.targetTouches[0].clientX);
+    const x = e.targetTouches[0].clientX;
+    setTouchEnd(x);
+    if (gestureStartXRef.current !== null) {
+      const delta = x - gestureStartXRef.current;
+      // Limit drag so users feel resistance at edges
+      const isAtStart = currentIndex === 0 && delta > 0;
+      const isAtEnd = currentIndex === total - 1 && delta < 0;
+      const dampened = (isAtStart || isAtEnd) ? delta * 0.35 : delta;
+      setDragDeltaX(dampened);
+      lastMoveTimeRef.current = performance.now();
+      lastMoveXRef.current = x;
+    }
   };
 
   
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd || isAnimating) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    if (!touchStart || !touchEnd || isAnimating) {
+      setIsDragging(false);
+      setDragDeltaX(0);
+      return;
+    }
+    const distance = touchEnd - touchStart; // positive: right swipe
+    const dt = Math.max(1, performance.now() - gestureStartTimeRef.current);
+    const velocity = distance / dt; // px/ms
 
-    if (isLeftSwipe && currentIndex < total - 1) {
-      handleNavigate(currentIndex + 1);
+    const shouldGoPrev = (distance > minSwipeDistance || velocity > minSwipeVelocity) && currentIndex > 0;
+    const shouldGoNext = (distance < -minSwipeDistance || velocity < -minSwipeVelocity) && currentIndex < total - 1;
+
+    setIsDragging(false);
+
+    if (shouldGoNext) {
+      // animate out to left, then navigate
+      setDragDeltaX(-window.innerWidth);
+      setTimeout(() => {
+        setDragDeltaX(0);
+        handleNavigate(currentIndex + 1);
+      }, 150);
+    } else if (shouldGoPrev) {
+      // animate out to right, then navigate
+      setDragDeltaX(window.innerWidth);
+      setTimeout(() => {
+        setDragDeltaX(0);
+        handleNavigate(currentIndex - 1);
+      }, 150);
+    } else {
+      // snap back
+      setDragDeltaX(0);
     }
     
-    if (isRightSwipe && currentIndex > 0) {
-      handleNavigate(currentIndex - 1);
-    }
-    
-  
     setTouchStart(null);
     setTouchEnd(null);
+    gestureStartXRef.current = null;
   };
 
   
@@ -119,6 +163,8 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+      style={{ touchAction: 'pan-y' }}
     >
       
 
@@ -160,16 +206,11 @@ const SwipeNavigator: React.FC<SwipeNavigatorProps> = ({
       
       
      
-      <div className="w-full h-full flex items-center justify-center">
-        <div 
+      <div className="w-full h-full flex items-center justify-center overflow-hidden">
+        <div
           key={currentIndex}
-          className={`w-full h-full flex items-center justify-center transition-all duration-300 ease-out ${
-            isAnimating ? 'animate-slide-in' : 'animate-fade-in-up'
-          }`}
-          style={{
-            animationDelay: '0ms',
-            animationFillMode: 'both'
-          }}
+          className={`w-full h-full flex items-center justify-center ${isDragging ? '' : 'transition-transform duration-300 ease-out'}`}
+          style={{ transform: `translateX(${dragDeltaX}px)` }}
         >
           {children}
         </div>
